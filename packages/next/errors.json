@@ -1140,5 +1140,16 @@
   "1139": "`unstable_catchError` can only be used in Client Components.",
   "1140": "Route %s used \\`import('next/root-params').%s()\\` inside \\`\"use cache\"\\` nested within \\`unstable_cache\\`. Root params are not available in this context.",
   "1141": "Route %s used \\`import('next/root-params').%s()\\` inside \\`unstable_cache\\`. This is not supported. Use \\`\"use cache\"\\` instead.",
-  "1142": "Route %s used \\`import('next/root-params').%s()\\` inside \\`generateStaticParams\\`, but the \\`%s\\` parameter was not provided by a parent \\`generateStaticParams\\`. In \\`generateStaticParams\\`, root params are only available for segments nested below the segment that provides them."
+  "1142": "Route %s used \\`import('next/root-params').%s()\\` inside \\`generateStaticParams\\`, but the \\`%s\\` parameter was not provided by a parent \\`generateStaticParams\\`. In \\`generateStaticParams\\`, root params are only available for segments nested below the segment that provides them.",
+  "1143": "Worker pool is ending, no more calls can be made",
+  "1144": "Worker exited with code %s%s",
+  "1145": "This file must be run as a worker thread",
+  "1146": "Worker pool closed",
+  "1147": "Child can only be used on a forked process",
+  "1148": "Error when calling setup: %s",
+  "1149": "Worker pool ended before task could be processed",
+  "1150": "\"null\" or \"undefined\" thrown",
+  "1151": "Unexpected request from parent process: %s",
+  "1152": "Worker exited unexpectedly with code %s, signal %s",
+  "1153": "Worker restarted due to timeout"
 }
