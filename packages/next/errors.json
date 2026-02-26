@@ -1155,5 +1155,6 @@
   "1154": "maxBootingWorkers must be at least 1",
   "1155": "Worker exited during shutdown",
   "1156": "Worker pool ended while requests were in-flight",
-  "1157": "Worker is ended, no more calls can be done to it"
+  "1157": "Worker is ended, no more calls can be done to it",
+  "1158": "Export encountered an error on %s, exiting the build."
 }
