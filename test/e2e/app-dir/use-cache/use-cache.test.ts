@@ -30,6 +30,19 @@ describe('use-cache', () => {
     return
   }
 
+  let cliOutputLength: number
+
+  beforeEach(() => {
+    cliOutputLength = next.cliOutput.length
+  })
+
+  afterEach(async () => {
+    // eslint-disable-next-line jest/no-standalone-expect
+    expect(next.cliOutput.slice(cliOutputLength)).not.toContain(
+      'unhandledRejection'
+    )
+  })
+
   it('should cache results', async () => {
     const browser = await next.browser(`/?n=1`)
     expect(await browser.waitForElementByCss('#x').text()).toBe('1')
@@ -1488,6 +1501,43 @@ describe('use-cache', () => {
     })
 
     await assertNoConsoleErrors(browser)
+  })
+
+  it('should dedupe shared inner caches across different outer caches', async () => {
+    const browser = await next.browser('/nested/1')
+    const first = await browser.elementByCss('.inner:nth-of-type(1)').text()
+    const second = await browser.elementByCss('.inner:nth-of-type(2)').text()
+    expect(first).toBe(second)
+  })
+
+  it('should resolve different children correctly when deduping', async () => {
+    const browser = await next.browser('/cached-with-children')
+    const childA = await browser
+      .elementByCss('.wrapper:first-child .children')
+      .text()
+    const childB = await browser
+      .elementByCss('.wrapper:last-child .children')
+      .text()
+    expect(childA).toBe('Child A')
+    expect(childB).toBe('Child B')
+
+    // The random value from the cache function should be the same for both
+    // wrappers, confirming the invocation was actually deduped.
+    const randA = await browser
+      .elementByCss('.wrapper:first-child .rand')
+      .text()
+    const randB = await browser.elementByCss('.wrapper:last-child .rand').text()
+    expect(randA).toBe(randB)
+  })
+
+  it('should stream the result of a deduped invocation', async () => {
+    const html = await next
+      .fetch('/nested/2')
+      .then((response) => response.text())
+
+    // The loading boundaries of both inner cache functions are expected to be
+    // shown while the page is loading.
+    expect(html).toIncludeRepeated('<p class="loading">Loading...</p>', 2)
   })
 })
 
