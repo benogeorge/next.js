@@ -1140,5 +1140,11 @@
   "1139": "`unstable_catchError` can only be used in Client Components.",
   "1140": "Route %s used \\`import('next/root-params').%s()\\` inside \\`\"use cache\"\\` nested within \\`unstable_cache\\`. Root params are not available in this context.",
   "1141": "Route %s used \\`import('next/root-params').%s()\\` inside \\`unstable_cache\\`. This is not supported. Use \\`\"use cache\"\\` instead.",
-  "1142": "Route %s used \\`import('next/root-params').%s()\\` inside \\`generateStaticParams\\`, but the \\`%s\\` parameter was not provided by a parent \\`generateStaticParams\\`. In \\`generateStaticParams\\`, root params are only available for segments nested below the segment that provides them."
+  "1142": "Route %s used \\`import('next/root-params').%s()\\` inside \\`generateStaticParams\\`, but the \\`%s\\` parameter was not provided by a parent \\`generateStaticParams\\`. In \\`generateStaticParams\\`, root params are only available for segments nested below the segment that provides them.",
+  "1143": "`unstable_navigation` must not be used within a Client Component. Next.js should be preventing `unstable_navigation` from being included in Client Components statically, but did not in this case.",
+  "1144": "Unexpected work unit store type.",
+  "1145": "`unstable_navigation()` cannot be called inside `generateStaticParams()`.",
+  "1146": "`unstable_navigation()` is only available with the `cacheComponents` config.",
+  "1147": "`unstable_navigation()` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context",
+  "1148": "`unstable_navigation()` cannot be called inside `unstable_cache()`."
 }
