@@ -502,8 +502,11 @@ pub const fn make_const_prehashed_string(text: &'static str) -> PrehashedString 
     }
 }
 
-/// Wrapper for collecting `rcstr!` static constants via `inventory`.
+// Re-export inventory so the rcstr! macro can reference it via $crate::inventory
+#[doc(hidden)]
+pub use inventory;
 
+/// Wrapper for collecting `rcstr!` static constants via `inventory`.
 #[doc(hidden)]
 pub struct StaticRcStr(pub &'static PrehashedString);
 
@@ -550,8 +553,8 @@ macro_rules! rcstr {
                 // Allocate static storage for the PrehashedString
                 static RCSTR_STORAGE: $crate::PrehashedString =
                     $crate::make_const_prehashed_string($s);
-                // Register with inventory so RcStr::from() can find this static
-                inventory::submit!($crate::StaticRcStr(&RCSTR_STORAGE));
+                // Register with inventory so deserialization can find this static
+                $crate::inventory::submit!($crate::StaticRcStr(&RCSTR_STORAGE));
                 // This basically just tags a bit onto the raw pointer and wraps it in an RcStr
                 // should be fast enough to do every time.
                 $crate::from_static(&RCSTR_STORAGE)
