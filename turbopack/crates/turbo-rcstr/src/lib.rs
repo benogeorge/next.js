@@ -174,13 +174,17 @@ impl RcStr {
         let len = s.len();
         if len >= tagged_value::MAX_INLINE_LEN {
             let hash = hash_bytes(s.as_bytes());
-            if let Some(static_phs) = static_lookup(hash, s) {
-                return new_static_atom(static_phs);
+            // Check the static table
+            if let Some(entries) = STATIC_TABLE.get(&hash)
+                && let Some(static_phs) = entries.iter().find(|phs| phs.value.as_str() == s)
+            {
+                new_static_atom(static_phs)
+            } else {
+                new_atom_from_prehashed(PrehashedString {
+                    hash,
+                    value: dynamic::Payload::String(s.into()),
+                })
             }
-            return new_atom_from_prehashed(PrehashedString {
-                hash,
-                value: dynamic::Payload::String(s.into()),
-            });
         } else {
             inline_atom(s).unwrap()
         }
@@ -529,17 +533,6 @@ static STATIC_TABLE: LazyLock<
     map.shrink_to_fit(); // this map will never change again
     map
 });
-
-/// Look up a string in the static constant table.
-/// Returns a reference to the static PrehashedString if an `rcstr!` constant
-/// with matching content exists.
-fn static_lookup(hash: u64, text: &str) -> Option<&'static PrehashedString> {
-    let entries = STATIC_TABLE.get(&hash)?;
-    entries
-        .iter()
-        .find(|phs| phs.value.as_str() == text)
-        .copied()
-}
 
 /// Create an rcstr from a string literal.
 /// Allocates the RcStr inline when possible, otherwise uses a static `PrehashedString`.
