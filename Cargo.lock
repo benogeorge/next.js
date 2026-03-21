@@ -9487,12 +9487,15 @@ dependencies = [
  "bincode 2.0.1",
  "bytes-str",
  "codspeed-criterion-compat",
+ "inventory",
  "napi",
  "new_debug_unreachable",
  "rustc-hash 2.1.1",
  "serde",
  "shrink-to-fit",
+ "smallvec",
  "triomphe 0.1.12",
+ "turbo-bincode",
  "turbo-tasks-hash",
 ]
 

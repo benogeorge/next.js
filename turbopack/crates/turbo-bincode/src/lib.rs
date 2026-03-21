@@ -7,7 +7,10 @@ use std::{any::Any, ptr::copy_nonoverlapping};
 use ::smallvec::SmallVec;
 use bincode::{
     BorrowDecode, Decode, Encode,
-    de::{BorrowDecoder, Decoder, DecoderImpl, read::Reader},
+    de::{
+        BorrowDecoder, Decoder, DecoderImpl,
+        read::{BorrowReader, Reader},
+    },
     enc::{Encoder, EncoderImpl, write::Writer},
     error::{DecodeError, EncodeError},
 };
@@ -61,6 +64,24 @@ pub fn turbo_bincode_encode_into<T: Encode>(
 pub fn turbo_bincode_decode<T: Decode<()>>(buf: &[u8]) -> Result<T, DecodeError> {
     let mut decoder = new_turbo_bincode_decoder(buf);
     let val = T::decode(&mut decoder)?;
+    let remaining_buf = decoder.reader().buffer;
+    if !remaining_buf.is_empty() {
+        return Err(DecodeError::ArrayLengthMismatch {
+            required: buf.len() - remaining_buf.len(),
+            found: buf.len(),
+        });
+    }
+    Ok(val)
+}
+
+/// Like [`turbo_bincode_decode`], but uses `BorrowDecode` to allow types to borrow directly
+/// from the input buffer instead of copying. This avoids heap allocations for types like
+/// `RcStr` that can construct from borrowed `&str`.
+pub fn turbo_bincode_borrow_decode<'buf, T: BorrowDecode<'buf, ()>>(
+    buf: &'buf [u8],
+) -> Result<T, DecodeError> {
+    let mut decoder = new_turbo_bincode_decoder(buf);
+    let val = T::borrow_decode(&mut decoder)?;
     let remaining_buf = decoder.reader().buffer;
     if !remaining_buf.is_empty() {
         return Err(DecodeError::ArrayLengthMismatch {
@@ -126,6 +147,20 @@ impl Reader for TurboBincodeReader<'_> {
 
     fn consume(&mut self, n: usize) {
         self.buffer = &self.buffer[n..];
+    }
+}
+
+impl<'a> BorrowReader<'a> for TurboBincodeReader<'a> {
+    #[inline(always)]
+    fn take_bytes(&mut self, length: usize) -> Result<&'a [u8], DecodeError> {
+        let (head, rest) =
+            self.buffer
+                .split_at_checked(length)
+                .ok_or_else(|| DecodeError::UnexpectedEnd {
+                    additional: length - self.buffer.len(),
+                })?;
+        self.buffer = rest;
+        Ok(head)
     }
 }
 
